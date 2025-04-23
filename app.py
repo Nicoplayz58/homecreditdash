@@ -227,9 +227,12 @@ def mostrar_figuras(tab):
     content = []
     for titulo, archivo in graficos:
         try:
-            fig = pio.read_json(archivo)
+            with open(archivo, "r") as f:
+                fig = pio.from_json(f.read())
+                
             content.append(html.H4(titulo, style=estilo_subtitulo))
             content.append(dcc.Graph(figure=fig))
+        
         except Exception as e:
             content.append(html.P(f"No se pudo cargar {archivo}: {e}"))
     
