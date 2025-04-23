@@ -43,6 +43,8 @@ estilo_parrafo = {
 
 # App Dash
 app = dash.Dash(__name__, title="Home Credit Dashboard")
+server = app.server
+
 
 app.layout = html.Div(style=estilo_general, children=[
     html.H1("Home Credit Risk Analysis", style=estilo_titulo),
