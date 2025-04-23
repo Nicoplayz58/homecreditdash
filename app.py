@@ -185,7 +185,7 @@ app.layout = html.Div(style=estilo_general, children=[
             ])
         ]),
         
-        dcc.Tab(label='Análisis Descriptivo',value="eda" ,children=[
+        dcc.Tab(label='Análisis Descriptivo', value="eda", children=[
             html.Div(style={
                 'backgroundColor': '#ffffff',
                 'padding': '40px 20px',
@@ -194,49 +194,44 @@ app.layout = html.Div(style=estilo_general, children=[
                 'alignItems': 'center'
             }, children=[
                 html.H2("Análisis Exploratorio de Datos (EDA)", style=estilo_subtitulo),
-                html.Div(id="contenido-figuras")  # Aquí se mostrarán los gráficos dinámicamente
+                dcc.Dropdown(
+                    id='dropdown-graficos',
+                    options=[
+                        {"label": "Distribución de la variable objetivo", "value": "fig_target.json"},
+                        {"label": "Variables con mayor porcentaje de valores nulos", "value": "fig_missing.json"},
+                        {"label": "Matriz de correlación numérica", "value": "fig_corr.json"},
+                        {"label": "Correlación entre variables categóricas (Cramér's V)", "value": "fig_cramers.json"},
+                        {"label": "Distribución ORGANIZATION_TYPE", "value": "organization_type.json"},
+                        {"label": "Distribución NAME_INCOME_TYPE", "value": "name_income_type.json"},
+                        {"label": "Distribución OCCUPATION_TYPE", "value": "occupation_type.json"},
+                        {"label": "Distribución NAME_CONTRACT_STATUS", "value": "name_contract_status.json"},
+                        {"label": "Distribución CODE_REJECT_REASON", "value": "code_reject_reason.json"},
+                    ],
+                    placeholder="Selecciona un gráfico para visualizar",
+                    style={'width': '80%', 'marginBottom': '20px'}
+                ),
+                html.Div(id="grafico-seleccionado")
             ])
         ]),
+
 
     ])
 ])
 
 @app.callback(
-    Output("contenido-figuras", "children"),
-    Input("tabs", "value")
+    Output("grafico-seleccionado", "children"),
+    Input("dropdown-graficos", "value")
 )
-def mostrar_figuras(tab):
+def mostrar_grafico_unico(nombre_archivo):
+    if not nombre_archivo:
+        return html.P("Selecciona un gráfico para visualizarlo.", style=estilo_parrafo)
 
-    print("Tab activo:", tab)
-    
-    if tab != "eda":
-        return html.Div()
-    
-    graficos = [
-        ("Distribución de la variable objetivo", "fig_target.json"),
-        ("Variables con mayor porcentaje de valores nulos", "fig_missing.json"),
-        ("Matriz de correlación numérica", "fig_corr.json"),
-        ("Correlación entre variables categóricas (Cramér's V)", "fig_cramers.json"),
-        ("Distribución ORGANIZATION_TYPE", "organization_type.json"),
-        ("Distribución NAME_INCOME_TYPE", "name_income_type.json"),
-        ("Distribución OCCUPATION_TYPE", "occupation_type.json"),
-        ("Distribución NAME_CONTRACT_STATUS", "name_contract_status.json"),
-        ("Distribución CODE_REJECT_REASON", "code_reject_reason.json")
-    ]
-    
-    content = []
-    for titulo, archivo in graficos:
-        try:
-            with open(archivo, "r") as f:
-                fig = pio.from_json(f.read())
-                
-            content.append(html.H4(titulo, style=estilo_subtitulo))
-            content.append(dcc.Graph(figure=fig))
-        
-        except Exception as e:
-            content.append(html.P(f"No se pudo cargar {archivo}: {e}"))
-    
-    return html.Div(style={'width': '90%', 'maxWidth': '1000px'}, children=content)
+    try:
+        fig = pio.read_json(nombre_archivo)
+        return dcc.Graph(figure=fig)
+    except Exception as e:
+        return html.P(f"No se pudo cargar el gráfico {nombre_archivo}: {e}", style=estilo_parrafo)
+
 
 # Ejecutar servidor
 if __name__ == '__main__':
