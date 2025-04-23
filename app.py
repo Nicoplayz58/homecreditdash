@@ -44,8 +44,8 @@ server = app.server
 app.layout = html.Div(style=estilo_general, children=[
     html.H1("Home Credit Risk Analysis", style=estilo_titulo),
 
-    dcc.Tabs(id="tabs", children=[
-        dcc.Tab(label='Contexto', children=[
+    dcc.Tabs(id="tabs", value="contexto", children=[
+        dcc.Tab(label='Contexto',value="contexto", children=[
             html.Div(style={
                 'backgroundColor': '#ffffff',
                 'padding': '10px 40px 40px 40px',
@@ -102,7 +102,7 @@ app.layout = html.Div(style=estilo_general, children=[
 
 
 
-       dcc.Tab(label='Planteamiento del Problema', children=[
+       dcc.Tab(label='Planteamiento del Problema',value="problema", children=[
             html.Div(style={
                 'backgroundColor': '#ffffff',
                 'padding': '40px 80px',
@@ -127,7 +127,7 @@ app.layout = html.Div(style=estilo_general, children=[
             ])
         ]),
 
-        dcc.Tab(label='Objetivos y Justificación', children=[
+        dcc.Tab(label='Objetivos y Justificación',value="objetivos",children=[
             html.Div([
                 html.H2("Objetivo General", style=estilo_subtitulo),
                 html.P("Analizar los datos de solicitantes de crédito para identificar factores asociados al riesgo de incumplimiento.", style=estilo_parrafo),
@@ -142,7 +142,7 @@ app.layout = html.Div(style=estilo_general, children=[
             ])
         ]),
 
-        dcc.Tab(label='Metodología', children=[
+        dcc.Tab(label='Metodología',value="metodologia", children=[
             html.Div(style={
                 'backgroundColor': '#ffffff',
                 'padding': '40px 80px',
@@ -185,7 +185,7 @@ app.layout = html.Div(style=estilo_general, children=[
             ])
         ]),
         
-        dcc.Tab(label='Análisis Descriptivo', children=[
+        dcc.Tab(label='Análisis Descriptivo',value="eda" ,children=[
             html.Div(style={
                 'backgroundColor': '#ffffff',
                 'padding': '40px 20px',
@@ -194,32 +194,46 @@ app.layout = html.Div(style=estilo_general, children=[
                 'alignItems': 'center'
             }, children=[
                 html.H2("Análisis Exploratorio de Datos (EDA)", style=estilo_subtitulo),
-        
-                html.Div(style={'width': '90%', 'maxWidth': '1000px'}, children=[
-                    html.H4("Distribución de la variable objetivo", style=estilo_subtitulo),
-                    dcc.Graph(figure=pio.read_json("fig_target.json")),
-        
-                    html.H4("Variables con mayor porcentaje de valores nulos", style=estilo_subtitulo),
-                    dcc.Graph(figure=pio.read_json("fig_missing.json")),
-        
-                    html.H4("Matriz de correlación numérica", style=estilo_subtitulo),
-                    dcc.Graph(figure=pio.read_json("fig_corr.json")),
-        
-                    html.H4("Correlación entre variables categóricas (Cramér's V)", style=estilo_subtitulo),
-                    dcc.Graph(figure=pio.read_json("fig_cramers.json")),
-        
-                    html.H4("Distribución de variables categóricas clave por TARGET", style=estilo_subtitulo),
-                    dcc.Graph(figure=pio.read_json("organization_type.json")),
-                    dcc.Graph(figure=pio.read_json("name_income_type.json")),
-                    dcc.Graph(figure=pio.read_json("occupation_type.json")),
-                    dcc.Graph(figure=pio.read_json("name_contract_status.json")),
-                    dcc.Graph(figure=pio.read_json("code_reject_reason.json")),
-                ])
+                html.Div(id="contenido-figuras")  # Aquí se mostrarán los gráficos dinámicamente
             ])
         ]),
 
     ])
 ])
+
+@app.callback(
+    Output("contenido-figuras", "children"),
+    Input("tabs", "value")
+)
+def mostrar_figuras(tab):
+
+    print("Tab activo:", tab)
+    
+    if tab != "eda":
+        return html.Div()
+    
+    graficos = [
+        ("Distribución de la variable objetivo", "fig_target.json"),
+        ("Variables con mayor porcentaje de valores nulos", "fig_missing.json"),
+        ("Matriz de correlación numérica", "fig_corr.json"),
+        ("Correlación entre variables categóricas (Cramér's V)", "fig_cramers.json"),
+        ("Distribución ORGANIZATION_TYPE", "organization_type.json"),
+        ("Distribución NAME_INCOME_TYPE", "name_income_type.json"),
+        ("Distribución OCCUPATION_TYPE", "occupation_type.json"),
+        ("Distribución NAME_CONTRACT_STATUS", "name_contract_status.json"),
+        ("Distribución CODE_REJECT_REASON", "code_reject_reason.json")
+    ]
+    
+    content = []
+    for titulo, archivo in graficos:
+        try:
+            fig = pio.read_json(archivo)
+            content.append(html.H4(titulo, style=estilo_subtitulo))
+            content.append(dcc.Graph(figure=fig))
+        except Exception as e:
+            content.append(html.P(f"No se pudo cargar {archivo}: {e}"))
+    
+    return html.Div(style={'width': '90%', 'maxWidth': '1000px'}, children=content)
 
 # Ejecutar servidor
 if __name__ == '__main__':
