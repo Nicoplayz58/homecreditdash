@@ -1,23 +1,34 @@
 import dash
 from dash import html, dcc
 import plotly.io as pio
+import json
+import os
+from dash.dependencies import Input, Output
 
-# Leer gráficos guardados
-fig_target = pio.read_json("fig_target.json")
-fig_missing = pio.read_json("fig_missing.json")
-fig_corr = pio.read_json("fig_corr.json")
-fig_cramers = pio.read_json("fig_cramers.json")
-fig_chi2 = pio.read_json("fig_chi2.json")
-fig_org = pio.read_json("fig_organization_type.json")
-fig_income = pio.read_json("fig_name_income_type.json")
-fig_occ = pio.read_json("fig_occupation_type.json")
-fig_status = pio.read_json("fig_name_contract_status.json")
-fig_reject = pio.read_json("fig_code_reject_reason.json")
+fig_files = {
+    "fig_target": "fig_target.json",
+    "fig_missing": "fig_missing.json",
+    "fig_corr": "fig_corr.json",
+    "fig_cramers": "fig_cramers.json",
+    "fig_org": "organization_type.json",
+    "fig_income": "name_income_type.json",
+    "fig_occ": "occupation_type.json",
+    "fig_status": "name_contract_status.json",
+    "fig_reject": "code_reject_reason.json"
+}
 
-# Estilo general
+
+# Diccionario de archivos JSON
+figs = {nombre: pio.read_json(ruta) for nombre, ruta in fig_files.items()}
+
+def cargar_figura(path):
+    with open(path, 'r') as f:
+        return json.load(f)
+
+# Estilos
 estilo_general = {
     'backgroundColor': '#f9f9f9',
-    'color': '#1a237e',  # Azul oscuro
+    'color': '#1a237e',
     'fontFamily': 'Arial, sans-serif',
     'padding': '30px'
 }
@@ -45,11 +56,10 @@ estilo_parrafo = {
 app = dash.Dash(__name__, title="Home Credit Dashboard")
 server = app.server
 
-
 app.layout = html.Div(style=estilo_general, children=[
     html.H1("Home Credit Risk Analysis", style=estilo_titulo),
 
-    dcc.Tabs([
+    dcc.Tabs(id="tabs", children=[
         dcc.Tab(label='Contexto', children=[
             html.Div(style={
                 'backgroundColor': '#ffffff',
@@ -208,31 +218,26 @@ app.layout = html.Div(style=estilo_general, children=[
                     'alignItems': 'center',
                 }, children=[
                     html.H4("Distribución de la variable objetivo", style=estilo_subtitulo),
-                    dcc.Graph(figure=fig_target, style={'marginBottom': '40px'}),
-
+                    dcc.Graph(figure=figs["fig_target"]),
+        
                     html.H4("Variables con mayor porcentaje de valores nulos", style=estilo_subtitulo),
-                    dcc.Graph(figure=fig_missing, style={'marginBottom': '40px'}),
-
+                    dcc.Graph(figure=figs["fig_missing"]),
+        
                     html.H4("Matriz de correlación numérica", style=estilo_subtitulo),
-                    dcc.Graph(figure=fig_corr, style={'marginBottom': '40px'}),
-                    
-                    html.H4("Importancia de variables categóricas (Chi-cuadrado)", style=estilo_subtitulo),
-                    dcc.Graph(figure=fig_chi2, style={'marginBottom': '40px'}),
-
+                    dcc.Graph(figure=figs["fig_corr"]),
+        
                     html.H4("Correlación entre variables categóricas (Cramér's V)", style=estilo_subtitulo),
-                    dcc.Graph(figure=fig_cramers, style={'marginBottom': '40px'}),
-
-
+                    dcc.Graph(figure=figs["fig_cramers"]),
+        
                     html.H4("Distribución de variables categóricas clave por TARGET", style=estilo_subtitulo),
-                    dcc.Graph(figure=fig_org, style={'marginBottom': '30px'}),
-                    dcc.Graph(figure=fig_income, style={'marginBottom': '30px'}),
-                    dcc.Graph(figure=fig_occ, style={'marginBottom': '30px'}),
-                    dcc.Graph(figure=fig_status, style={'marginBottom': '30px'}),
-                    dcc.Graph(figure=fig_reject, style={'marginBottom': '30px'}),
+                    dcc.Graph(figure=figs["fig_org"]),
+                    dcc.Graph(figure=figs["fig_income"]),
+                    dcc.Graph(figure=figs["fig_occ"]),
+                    dcc.Graph(figure=figs["fig_status"]),
+                    dcc.Graph(figure=figs["fig_reject"])
                 ])
             ])
         ]),
-
 
     ])
 ])
