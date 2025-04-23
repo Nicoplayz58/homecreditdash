@@ -1,0 +1,11 @@
+# No subir notebooks temporales
+.ipynb_checkpoints/
+
+# No subir cachés de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# No subir archivos del sistema
+.DS_Store
+Thumbs.db
