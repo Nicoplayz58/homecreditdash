@@ -199,7 +199,7 @@ app.layout = html.Div(style=estilo_general, children=[
                 ], style=estilo_parrafo)
             ])
         ]),
-
+        
         dcc.Tab(label='Análisis Descriptivo', children=[
             html.Div(style={
                 'backgroundColor': '#ffffff',
@@ -209,32 +209,29 @@ app.layout = html.Div(style=estilo_general, children=[
                 'alignItems': 'center'
             }, children=[
                 html.H2("Análisis Exploratorio de Datos (EDA)", style=estilo_subtitulo),
-
-                html.Div(style={
-                    'width': '90%',
-                    'maxWidth': '1000px',
-                    'display': 'flex',
-                    'flexDirection': 'column',
-                    'alignItems': 'center',
-                }, children=[
+        
+                html.Div(style={'width': '90%', 'maxWidth': '1000px'}, children=[
                     html.H4("Distribución de la variable objetivo", style=estilo_subtitulo),
-                    dcc.Graph(figure=figs["fig_target"]),
+                    dcc.Graph(figure=pio.read_json("fig_target.json")),
         
                     html.H4("Variables con mayor porcentaje de valores nulos", style=estilo_subtitulo),
-                    dcc.Graph(figure=figs["fig_missing"]),
+                    dcc.Graph(figure=pio.read_json("fig_missing.json")),
         
                     html.H4("Matriz de correlación numérica", style=estilo_subtitulo),
-                    dcc.Graph(figure=figs["fig_corr"]),
+                    dcc.Graph(figure=pio.read_json("fig_corr.json")),
+        
+                    html.H4("Importancia de variables categóricas (Chi-cuadrado)", style=estilo_subtitulo),
+                    dcc.Graph(figure=pio.read_json("fig_chi2.json")),
         
                     html.H4("Correlación entre variables categóricas (Cramér's V)", style=estilo_subtitulo),
-                    dcc.Graph(figure=figs["fig_cramers"]),
+                    dcc.Graph(figure=pio.read_json("fig_cramers.json")),
         
                     html.H4("Distribución de variables categóricas clave por TARGET", style=estilo_subtitulo),
-                    dcc.Graph(figure=figs["fig_org"]),
-                    dcc.Graph(figure=figs["fig_income"]),
-                    dcc.Graph(figure=figs["fig_occ"]),
-                    dcc.Graph(figure=figs["fig_status"]),
-                    dcc.Graph(figure=figs["fig_reject"])
+                    dcc.Graph(figure=pio.read_json("organization_type.json")),
+                    dcc.Graph(figure=pio.read_json("name_income_type.json")),
+                    dcc.Graph(figure=pio.read_json("occupation_type.json")),
+                    dcc.Graph(figure=pio.read_json("name_contract_status.json")),
+                    dcc.Graph(figure=pio.read_json("code_reject_reason.json")),
                 ])
             ])
         ]),
