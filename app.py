@@ -5,21 +5,6 @@ import json
 import os
 from dash.dependencies import Input, Output
 
-fig_files = {
-    "fig_target": "fig_target.json",
-    "fig_missing": "fig_missing.json",
-    "fig_corr": "fig_corr.json",
-    "fig_cramers": "fig_cramers.json",
-    "fig_org": "organization_type.json",
-    "fig_income": "name_income_type.json",
-    "fig_occ": "occupation_type.json",
-    "fig_status": "name_contract_status.json",
-    "fig_reject": "code_reject_reason.json"
-}
-
-
-# Diccionario de archivos JSON
-figs = {nombre: pio.read_json(ruta) for nombre, ruta in fig_files.items()}
 
 def cargar_figura(path):
     with open(path, 'r') as f:
@@ -219,9 +204,6 @@ app.layout = html.Div(style=estilo_general, children=[
         
                     html.H4("Matriz de correlación numérica", style=estilo_subtitulo),
                     dcc.Graph(figure=pio.read_json("fig_corr.json")),
-        
-                    html.H4("Importancia de variables categóricas (Chi-cuadrado)", style=estilo_subtitulo),
-                    dcc.Graph(figure=pio.read_json("fig_chi2.json")),
         
                     html.H4("Correlación entre variables categóricas (Cramér's V)", style=estilo_subtitulo),
                     dcc.Graph(figure=pio.read_json("fig_cramers.json")),
